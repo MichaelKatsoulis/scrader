@@ -1,0 +1,177 @@
+<html>
+	<head>
+		<title>Bootstrap-Material DateTimePicker</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+
+		<link rel="stylesheet"
+			  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/bootstrap-material-design.min.css"/>
+		<link rel="stylesheet"
+			  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/ripples.min.css"/>
+
+		<link rel="stylesheet" href="../../static/css/bootstrap-material-datetimepicker.css" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto:400,500' rel='stylesheet' type='text/css'>
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+		<script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/js/ripples.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/js/material.min.js"></script>
+		<script type="text/javascript" src="https://rawgit.com/FezVrasta/bootstrap-material-design/master/dist/js/material.min.js"></script>
+		<script type="text/javascript" src="http://momentjs.com/downloads/moment-with-locales.min.js"></script>
+		<script type="text/javascript" src="../../static/js/bootstrap-material-datetimepicker.js"></script>
+
+		<style>
+			body 
+			{
+				font-family: 'Roboto', sans-serif;
+			}
+			h2 
+			{
+				padding: 0 20px 10px 20px;
+				font-size: 20px;
+				font-weight: 400;
+			}
+			.form-control-wrapper 
+			{
+				margin: 10px 20px;
+			}
+			code 
+			{
+				padding: 10px;
+				background: #eee!important;
+				display: block;
+				color: #000;
+			}
+			code > p 
+			{
+				font-weight: bold;
+				color: #000;
+				font-size: 1.5em;
+			}
+			@media(max-width: 300px)
+			{
+				.well { margin : 0}
+			}
+		</style>
+		<script>
+			(function(i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function() {
+					(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o),
+					m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+			ga('create', 'UA-60343429-1', 'auto');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<div class="container well">
+			<div class="row">
+				<div class="col-md-6">
+					<h2>Pick the time for your daily notifications</h2>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-control-wrapper" id="datetimepicker1">
+						<input type="text" id="time" class="form-control floating-label" placeholder="Time">
+					</div>
+				</div>
+			</div>
+			<input type="button" onclick="myFunction()" value="Done" class="btn btn-large btn-block  btn-success">
+		</div>
+		<script type="text/javascript">
+		$(document).ready(function()
+		{
+			var user_datetime;
+			$.ajax({
+	          type: 'GET',
+	          url: 'http://146.185.138.240/scrader/user_datetime/{{user_id}}',
+	          dataType: 'json',
+	          success: function (jsondata) {
+						console.log(jsondata);
+						user_datetime = jsondata;
+						if (user_datetime) {
+							$("#datetimepicker1").find("input").val(user_datetime);
+						}
+
+						$('#time').bootstrapMaterialDatePicker
+						({
+							date: false,
+							shortTime: false,
+							format: 'HH:mm'
+						});
+
+						$.material.init();
+						$("#time").focus().focus();
+			                  
+			          },
+	          complete: function (data) {
+	                  // Schedule the next
+	                  //setTimeout(doAjax, interval);
+	          }
+      		});
+
+
+			
+		});
+		</script>
+
+		<script>
+
+			function myFunction() {
+
+			    time =  $("#datetimepicker1").find("input").val();
+			    console.log(time);
+			    data = {user: '{{ user_id }}' , datetime: ''};
+			    data.datetime = time;
+			    var jsonString = JSON.stringify(data);
+			    url = "http://146.185.138.240/scrader/user_datetime"
+			    $.ajax({
+			    type: "POST",
+			    contentType: "application/json; charset=utf-8",
+			    url: url,
+			    data: jsonString,
+			    success: success,
+			    dataType: 'json'
+			    });
+
+			}
+
+			function success() {    
+			  /*
+			  Broadcast API
+			  http://docs.chatfuel.com/broadcasting/broadcasting-documentation/broadcasting-api
+
+			  -----------------------------------------------------
+			  https://api.chatfuel.com/bots/%3CBOT_ID%3E/users/%3CUSER_ID%3E/send?chatfuel_token=%3CTOKEN%3E&chatfuel_block_name=%3CBLOCK_NAME%3E&%3CUSER_ATTRIBUTE_1%3E=%3CVALUE_1%3E&%3CUSER_ATTRIBUTE_2%3E=%3CVALUE_2 */
+			 console.log('{{name}}'); 
+			 url = "https://api.chatfuel.com/bots/591189a0e4b0772d3373542b/users/{{user_id}}/send?chatfuel_token=vnbqX6cpvXUXFcOKr5RHJ7psSpHDRzO1hXBY8dkvn50ZkZyWML3YdtoCnKH7FSjC&chatfuel_block_id=59dfab4fe4b0662e54344b62&last%20name={{name}}"
+			 console.log(url);
+			 $.ajax({ 
+			      type: "POST",
+			      contentType: "application/json; charset=utf-8",
+			      url: url,
+			      success: windowclose,
+			      dataType: 'json'
+			    }); 
+
+			};
+
+			function windowclose() { 
+			 
+			    window.close();
+			    $('.form_time').hide();
+			}
+
+		</script>
+	</body>
+</html>

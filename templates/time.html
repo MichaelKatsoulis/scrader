@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Notifications Timepicker - Scrader</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="../../static/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="../../static/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+</head>
+
+<body>
+<div class="container">
+    <form action="" class="form-horizontal">
+        <fieldset>
+            <legend>Hi {{name}}! Pick the time of the day you want to be notified</legend>
+			<div class="control-group">
+                <!-- <label class="control-label">Pick the Time</label> -->
+                <div style="margin-left: 0px" id="datetimepicker1" class="controls input-append date form_time" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
+                    <input id="DateTimePicker" size="16" type="text" value="" readonly>
+                    <span class="add-on"><i class="icon-remove"></i></span>
+					<span class="add-on"><i class="icon-th"></i></span>
+                </div>
+				<input type="hidden" id="dtp_input3" value="" /><br/>
+            </div>
+        </fieldset>
+        <input type="button" onclick="myFunction()" value="Done" class="btn btn-large btn-block  btn-success">
+    </form>
+</div>
+
+<script type="text/javascript" src="../../static/jquery-1.8.3.min.js" charset="UTF-8"></script>
+<script type="text/javascript" src="../../static/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../static/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript">
+	$('.form_time').datetimepicker({
+        language:  'en',
+        weekStart: 1,
+        todayBtn:  0,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 1,
+		minView: 0,
+		maxView: 1,
+		forceParse: 0
+    });
+$("#datetimepicker1").find("input").val();
+
+</script>
+
+
+<script>
+
+function myFunction() {
+
+    time =  $("#datetimepicker1").find("input").val();
+    console.log(time);
+    data = {user: '{{ user_id }}' , datetime: ''};
+    data.datetime = time;
+    var jsonString = JSON.stringify(data);
+    url = "http://146.185.138.240/scrader/user_datetime"
+    $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: url,
+    data: jsonString,
+    success: success,
+    dataType: 'json'
+    });
+
+}
+
+function success() {    
+  /*
+  Broadcast API
+  http://docs.chatfuel.com/broadcasting/broadcasting-documentation/broadcasting-api
+
+  -----------------------------------------------------
+  https://api.chatfuel.com/bots/%3CBOT_ID%3E/users/%3CUSER_ID%3E/send?chatfuel_token=%3CTOKEN%3E&chatfuel_block_name=%3CBLOCK_NAME%3E&%3CUSER_ATTRIBUTE_1%3E=%3CVALUE_1%3E&%3CUSER_ATTRIBUTE_2%3E=%3CVALUE_2 */
+ console.log('{{name}}'); 
+ url = "https://api.chatfuel.com/bots/591189a0e4b0772d3373542b/users/{{user_id}}/send?chatfuel_token=vnbqX6cpvXUXFcOKr5RHJ7psSpHDRzO1hXBY8dkvn50ZkZyWML3YdtoCnKH7FSjC&chatfuel_block_id=59dfab4fe4b0662e54344b62&last%20name={{name}}"
+ console.log(url);
+ $.ajax({ 
+      type: "POST",
+      contentType: "application/json; charset=utf-8",
+      url: url,
+      success: windowclose,
+      dataType: 'json'
+    }); 
+
+};
+
+function windowclose() { 
+ 
+    window.close();
+    $('.form_time').hide();
+}
+
+</script>
+
+</body>
+</html>

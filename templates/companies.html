@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Scrader's Supported Companies</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://146.185.138.240/static/styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script>
+    (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.com/en_US/messenger.Extensions.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'Messenger'));
+  </script>   
+
+<script>
+  window.extAsyncInit = function() {
+
+    console.log('the Messenger Extensions JS SDK is done loading ');
+    // the Messenger Extensions JS SDK is done loading 
+
+  };
+
+</script>
+</head>
+<body>
+
+
+<div class="main-container">
+
+        <div class="panel">
+            <div id="companies_header" class="panel-heading"> {{name}} these are Scrader's Supported Companies. Please select the ones you would like to get notifications for.</div>
+            <div class="panel-body panel-custom-body">
+             <form id="myForm" class="companies_form">
+                <ul id="mylist" class="input-list">
+                </ul>
+                <input type="button" onclick="myFunction()" value="Done" class="btn btn-success btn-block">
+                 </form>
+            </div>
+        </div>
+
+</div>
+
+
+
+
+
+<script>
+
+$( document ).ready(function() {
+    
+    //all_companies = ["Amazon","Google", "Facebook", "Instagram", "Adidas", "Vmware", "Samsung", "Huawei"]
+    
+    $.ajax({
+          type: 'GET',
+          url: 'http://146.185.138.240/scrader/all_companies',
+          dataType: 'json',
+          success: function (jsondata) {
+                  //console.log(jsondata);
+                  all_companies = jsondata
+                  console.log(all_companies);
+                  var companies_arr = $.map(all_companies, function(el) { return el });     
+                  for (var i=0; i< all_companies.length - 1; i++){
+      
+                      var list_elem = document.createElement("li");
+                      var div = document.createElement("div");
+                      div.className = "pure-checkbox-toggle";
+                      var input = document.createElement("input");
+                      input.id = all_companies[i];
+                      input.name = "checkbox";
+                      input.type = "checkbox";
+                      input.value = "value";
+                      div.appendChild(input);
+                      var label = document.createElement("Label");
+                      label.setAttribute("for", all_companies[i]);
+                      label.innerHTML = all_companies[i];
+                      div.appendChild(label);
+
+                      list_elem.appendChild(div);
+                      parent = document.getElementById("mylist");
+                      parent.appendChild(list_elem);
+                  }
+          },
+          complete: function (data) {
+                  // Schedule the next
+                  //setTimeout(doAjax, interval);
+          }
+      });
+
+
+  //   for (var i=0; i< all_companies.length - 1; i++){
+      
+  //     var list_elem = document.createElement("li");
+  //     var div = document.createElement("div");
+  //     div.className = "pure-checkbox-toggle";
+  //     var input = document.createElement("input");
+  //     input.id = all_companies[i];
+  //     input.name = "checkbox";
+  //     input.type = "checkbox";
+  //     input.value = "value";
+  //     div.appendChild(input);
+  //     var label = document.createElement("Label");
+  //     label.setAttribute("for", all_companies[i]);
+  //     label.innerHTML = all_companies[i];
+  //     div.appendChild(label);
+
+  //     list_elem.appendChild(div);
+  //     parent = document.getElementById("mylist");
+  //     parent.appendChild(list_elem);
+  // }
+
+
+    $.ajax({
+              type: 'GET',
+              url: 'http://146.185.138.240/companies/{{user_id}}',
+              dataType: 'json',
+              success: function (jsondata) {
+                      //console.log(jsondata);
+                      companies = jsondata
+                      console.log(companies);
+                      var companies_arr = $.map(companies, function(el) { return el });
+                      element = document.getElementById("myForm");
+                      for (var i=0; i< element.elements.length - 1; i++) {
+                        name = element.elements[i].id;
+                        if ($.inArray(name, companies_arr) != -1){
+                          element.elements[i].checked = true;
+                        }
+                        console.log(element.elements[i].checked);
+                      }      
+
+              },
+              complete: function (data) {
+                      // Schedule the next
+                      //setTimeout(doAjax, interval);
+              }
+          });
+});
+
+function myFunction() {
+    element = document.getElementById("myForm");
+    data = {user: '{{ user_id }}' , companies: ''};
+    companies_list = [];
+     for (var i=0; i< element.elements.length - 1; i++){
+      name = element.elements[i].id;
+      clicked = element.elements[i].checked;
+      console.log(name + ' clicked ' + clicked);
+      if (clicked) {
+          companies_list.push(name);
+      }
+     }
+     data.companies = companies_list;
+     var jsonString = JSON.stringify(data);
+     url = "http://146.185.138.240/scrader/user_companies"
+     $.ajax({
+      type: "POST",
+      contentType: "application/json; charset=utf-8",
+      url: url,
+      data: jsonString,
+      success: success,
+      dataType: 'json'
+    });
+}
+
+
+function success() {    
+  /*
+  Broadcast API
+  http://docs.chatfuel.com/broadcasting/broadcasting-documentation/broadcasting-api
+
+  -----------------------------------------------------
+  https://api.chatfuel.com/bots/%3CBOT_ID%3E/users/%3CUSER_ID%3E/send?chatfuel_token=%3CTOKEN%3E&chatfuel_block_name=%3CBLOCK_NAME%3E&%3CUSER_ATTRIBUTE_1%3E=%3CVALUE_1%3E&%3CUSER_ATTRIBUTE_2%3E=%3CVALUE_2 */
+ console.log('{{name}}'); 
+ url = "https://api.chatfuel.com/bots/591189a0e4b0772d3373542b/users/{{user_id}}/send?chatfuel_token=vnbqX6cpvXUXFcOKr5RHJ7psSpHDRzO1hXBY8dkvn50ZkZyWML3YdtoCnKH7FSjC&chatfuel_block_id=59b7ff1ae4b07955ad7993b2&last%20name={{name}}"
+ console.log(url);
+ $.ajax({ 
+      type: "POST",
+      contentType: "application/json; charset=utf-8",
+      url: url,
+      success: windowclose,
+      dataType: 'json'
+    }); 
+
+};
+function windowclose() { 
+  /* 
+MessengerExtensions.requestCloseBrowser(function success() {}, function failure(err) {
+  alert('error closing the window: ' + err); // error closing the window: 
+  console.log(err); // doesn't print
+ // window.close();
+});       */ 
+           //  We need to do something for Safari. On iOS the window doesn't close so I have written the following
+          window.close();
+      $('#companies_header').text('Companies Saved. Please close this window and return to Messenger.');
+
+      $('.panel-custom-body').hide();
+
+  }
+</script>
+
+
+
+</body>
+</html>

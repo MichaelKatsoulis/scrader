@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+    scrader_server:
+      image: scrader_server_image
+      ports:
+        - "8000:8000"
+      environment:
+        - SERVICE_PORTS=8000
+      networks:
+        - web
+      deploy:
+        replicas: 1
+        update_config:
+          parallelism: 1
+          delay: 10s
+      volumes:
+        - .:/code
+      depends_on:
+        - db
+    db:
+      image: mongo:3.0.2
+      volumes:
+        - ./dbdata:/data/db
+      networks:
+        - web
+    proxy:
+      image: dockercloud/haproxy
+      depends_on:
+        - db
+        - scrader_server
+      environment:
+        - BALANCE=roundrobin
+        - BACKEND_PORT=8000
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      ports:
+        - 80:80
+      networks:
+        - web
+      deploy:
+        placement:
+          constraints: [node.role == manager]
+networks:
+  web:
+    driver: overlay

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+window.onload = function () {
+
+  var count = 0;
+  do_magic();
+
+
+  function do_magic() {
+
+    var interval = 1000;  // 1000 = 1 second, 3000 = 3 seconds
+      function doAjax() {
+          $.ajax({
+              type: 'GET',
+              url: 'latest_news',
+              dataType: 'json',
+              success: function (jsondata) {
+                      //console.log(jsondata);
+                      news_data = create_news_data(jsondata)
+                      create_chart(news_data);
+              },
+              complete: function (data) {
+                      // Schedule the next
+                      setTimeout(doAjax, interval);
+              }
+          });
+      }
+
+  setTimeout(doAjax, interval);
+}
+
+
+  function create_news_data(jsondata){
+
+  
+      good_news = [];
+      bad_news = [];
+      for (company in jsondata) {
+      	
+      	template_good_company = { label: company, y: jsondata[company]['Good_news'].length};
+      	good_news.push(template_good_company);
+      	template_bad_company = { label: company, y: jsondata[company]['Bad_news'].length};
+      	bad_news.push(template_bad_company);
+      };
+      //console.log(good_news);
+      
+      // good_news = [{ label: "Google", y: jsondata.Google.Good_news.length},
+      //              { label: "Amazon", y: jsondata.Amazon.Good_news.length },
+      //              { label: "Microsoft", y: jsondata.Microsoft.Good_news.length },
+      //              { label: "Apple", y: jsondata.Apple.Good_news.length },
+      //              { label: "Ericsson", y: jsondata.Ericsson.Good_news.length }
+      //             ];
+
+      // console.log(good_news);
+      // bad_news = [{ label: "Google", y: jsondata.Google.Bad_news.length },
+      //             { label: "Amazon", y: jsondata.Amazon.Bad_news.length },
+      //             { label: "Microsoft", y: jsondata.Microsoft.Bad_news.length },
+      //             { label: "Apple", y: jsondata.Apple.Bad_news.length },
+      //             { label: "Ericsson", y: jsondata.Ericsson.Bad_news.length }
+                 // ];
+
+      news_data = {};
+      news_data = {"good":good_news,"bad":bad_news};
+
+      return news_data;
+
+  }
+
+
+  function create_chart(data) {
+
+   var chart = new CanvasJS.Chart("chartContainer");
+
+  //chart.options.axisY = { suffix: "K" };
+    chart.options.title = { text: "Good & Bad news" };
+
+    var series1 = { //dataSeries - first quarter
+        type: "column",
+        name: "Good news",
+        showInLegend: true
+    };
+
+    var series2 = { //dataSeries - second quarter
+        type: "column",
+        name: "Bad news",
+        showInLegend: true
+    };
+
+    chart.options.data = [];
+    chart.options.data.push(series1);
+    chart.options.data.push(series2);
+
+
+    series1.dataPoints = data["good"];
+
+    series2.dataPoints = data["bad"];
+
+    chart.render();
+  }
+
+
+  $("#Update_chart").click(function () {
+    console.log("clicked");
+    do_magic();
+   });
+
+ }
+
+
+</script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</head>
+
+<body>
+    <div id="chartContainer" style="height: 300px; width: 100%;">
+    </div>
+  <!-- <button id= "Update_chart">Update Chart</button>  -->
+</body>
+</html>
