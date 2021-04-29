@@ -12,6 +12,6 @@ Jinja2==2.9.6
 MarkupSafe==1.0
 pandas==0.21.0
 python-dateutil==2.6.1
-Werkzeug==0.12.2
+Werkzeug==0.15.3
 xlrd==1.1.0
 
