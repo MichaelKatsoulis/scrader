@@ -9,7 +9,7 @@ beautifulsoup4==4.6.0
 bs4==0.0.1
 decorator==4.0.6
 Jinja2==2.9.6
-MarkupSafe==1.0
+MarkupSafe==2.0.1
 pandas==0.21.0
 python-dateutil==2.6.1
 Werkzeug==0.12.2
